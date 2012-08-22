@@ -1,4 +1,4 @@
-require 'rubygems'
+#require 'rubygems'
 
 # usage Git::Blames::Pending.new(
 #   :root => <root folder where build logs are located>
@@ -73,9 +73,8 @@ class Git::Blames::Pending
   end
 
   def rspec_results
-    rspec_output = `rspec spec`
-    puts rspec_output
-    rspec_output
+    results =  `rspec spec`
+    results
   end
 
   def find_contributors
@@ -125,7 +124,6 @@ class Git::Blames::Pending
     task = {}
 
     spec_output.each do |line|
-      puts "line = #{line}"
       if found_pending_marker line
         status = 'start'
         

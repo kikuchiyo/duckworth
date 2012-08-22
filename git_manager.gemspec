@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name        = 'git_manager'
-  s.version     = '0.0.1'
+  s.version     = '0.0.2'
   s.date        = '2012-08-21'
   s.summary     = "gem to manage git"
   s.description = "delete old git branches and blame pending specs"

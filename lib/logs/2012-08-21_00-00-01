@@ -1,0 +1,11 @@
+Pending:
+  Fake test 1 spec/git_manager_spec.rb
+    # Test 123
+    # ./spec/git_manager_spec.rb:13
+  Fake test 2 spec/git_manager_spec.rb
+    # Test 123
+    # ./spec/git_manager_spec.rb:11
+
+Finished in x minutes y seconds
+z examples, 0 failures, 2 pending
+Finished: SUCCESS

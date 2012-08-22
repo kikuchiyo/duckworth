@@ -51,7 +51,8 @@ module Git
               "#{attributes[:spec_file]} : " +
               "#{attributes[:line_number]}",
             :message => "Spec Details:\n  " +
-              "#{attributes[:details].join('\n')}"
+              "Details\n  #{attributes[:details].join('\n')}\n" +
+              "Collaborators:\n  #{attributes[:contributors].join(', ')}\n"
         end
       end
     end

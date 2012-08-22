@@ -1,26 +1,66 @@
-#require 'rubygems'
+# example usage 
+#   Git::Blames::Pending.new(
+#     :root => <root folder where build logs are located>
+#     :rspec => boolean specifying whether or 
+#       not you want to run rspec now to get pending specs
+#   ).blame( :email => true )
+#   for emailing create a config/email.yml file as specified
+#   in this gems own config/email.yml file
+# example usage 
+#   Git::Managed::Branch.new.delete_branches
 
-# usage Git::Blames::Pending.new(
-#   :root => <root folder where build logs are located>
-#   :rspec => boolean specifying whether or 
-#     not you want to run rspec now to get pending specs
-# ).blame
-# usage Git::Managed::Branch.new.delete_branches
+require 'rubygems'
+require 'net/smtp'
+require 'yaml'
 
 module Git
+  module Emails
+    def load_configuration
+      config = YAML::load_file('./config/email.yml')
+      @email_from = config['authentication']['from']
+      @email_password = config['authentication']['password']
+      @email_mappings = config['users']
+    end
+  
+    def send_gmail options
+      load_configuration
+      recipients = options[:recipients]
+      msg = "Subject: #{options[:subject]}\n\n#{options[:message]}"
+      smtp = Net::SMTP.new 'smtp.gmail.com', 587
+      smtp.enable_starttls
+      smtp.start( '', @email_from, @email_password, :login ) do
+        smtp.send_message(msg, @email_from, recipients.map{ |recipient| @email_mappings[recipient]})
+      end
+    end
+  end
+
   module Managed
     class Branch
     end
   end
+
   module Blames
-    def blame
+    include Git::Emails
+    def blame(options = nil)
       self.tasks.each_pair do |key, attributes|
-        puts "\nPending Spec Information:"
-        puts "  Description: #{key}"
-        puts "  Contributors: #{attributes[:contributors].join(', ')}"
-        puts "  File: #{attributes[:spec_file]}"
-        puts "  Line: #{attributes[:line_number]}\n"
+        if options.nil? || !options[:email]
+          stdout key, attributes
+        else
+          send_gmail :recipients => attributes[:contributors],
+            :subject => "Please collaborate to fix spec: " +
+              "#{attributes[:spec_file]} : " +
+              "#{attributes[:line_number]}",
+            :message => "Spec Details:\n  " +
+              "#{attributes[:details].join('\n')}"
+        end
       end
+    end
+    def stdout
+      puts "\nPending Spec Information:"
+      puts "  Description: #{key}"
+      puts "  Contributors: #{attributes[:contributors].join(', ')}"
+      puts "  File: #{attributes[:spec_file]}"
+      puts "  Line: #{attributes[:line_number]}\n"
     end
     class Pending
     end

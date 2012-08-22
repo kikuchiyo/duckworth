@@ -1,6 +1,10 @@
 require 'rubygems'
 
-# usage Git::Blames::Pending.new.blame
+# usage Git::Blames::Pending.new(
+#   :root => <root folder where build logs are located>
+#   :rspec => boolean specifying whether or 
+#     not you want to run rspec now to get pending specs
+# ).blame
 # usage Git::Managed::Branch.new.delete_branches
 
 module Git
@@ -27,7 +31,7 @@ end
 
 class Git::Managed::Branch
   attr_accessor :branches, :current_branch, :branches_to_delete
-  def initialize  
+  def initialize
     @branches = `git branch`.split /\n/
     partition_branches
   end
@@ -52,12 +56,26 @@ class Git::Managed::Branch
 end
 
 class Git::Blames::Pending 
-  attr_accessor :tasks
+  attr_accessor :tasks, :rspec_results
+
   include Git::Blames
-  def initialize
-    @root = "#{File.dirname(__FILE__)}/logs"
-    find_pending_specs_by_logfile_name( "#{@root}/#{find_last_logfile_name}" )
+
+  def initialize options = nil
+    if options.nil? || options[:root].nil? && !options[:rspec]
+      @root = "#{File.dirname(__FILE__)}/logs"
+    elsif options[:rspec]
+      find_pending_specs_by_rspec_results( rspec_results )
+    else
+      @root = options[:root]
+      find_pending_specs_by_logfile_name( "#{@root}/#{find_last_logfile_name}" )
+    end
     find_contributors
+  end
+
+  def rspec_results
+    rspec_output = `rspec spec`
+    puts rspec_output
+    rspec_output
   end
 
   def find_contributors
@@ -101,6 +119,35 @@ class Git::Blames::Pending
     files.to_a.select { |log| log.match /\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}/ }.sort.last
   end
 
+  def find_pending_specs_by_rspec_results spec_output
+    status = ''
+    @tasks = {}
+    task = {}
+
+    spec_output.each do |line|
+      puts "line = #{line}"
+      if found_pending_marker line
+        status = 'start'
+        
+      elsif found_new_spec_marker line, status
+        status = 'found new pending spec'  
+        task = {}
+        task[:name] = line.chomp
+        task[:details] = []
+
+      elsif found_spec_details_marker line, status
+        status = 'updating spec data'
+        if line.match /(spec.*)[:](\d+)/
+          task[:spec_file] = $1
+          task[:line_number] = $2
+        else
+          task[:details].push line.chomp
+        end
+        @tasks[task[:name]] = task
+      end
+    end
+  end
+
   def find_pending_specs_by_logfile_name logfile_name
     logfile = File.new( logfile_name )
     status = ''
@@ -131,4 +178,3 @@ class Git::Blames::Pending
     end
   end
 end
-

@@ -34,9 +34,10 @@ describe Git do
   
   describe Git::Blames::Pending do
     before :each do
+      Git::Blames::Pending.any_instance.stub(:rspec_results){'mr huxtable'}
       @test_01 = '  Fake test 1 spec/git_manager_spec.rb'
       @test_02 = '  Fake test 2 spec/git_manager_spec.rb'
-      @git_blames_pending = Git::Blames::Pending.new
+      @git_blames_pending = Git::Blames::Pending.new(:root => './lib/logs')
       @expected_tasks = {
         @test_01  => {
           :spec_file  => 'spec/git_manager_spec.rb',
@@ -59,18 +60,22 @@ describe Git do
       @git_blames_pending.tasks[@test_01][:spec_file].should == @expected_tasks[@test_01][:spec_file]
       @git_blames_pending.tasks[@test_02][:spec_file].should == @expected_tasks[@test_02][:spec_file]
     end 
+
     it "collects pending spec line number as expected" do
       @git_blames_pending.tasks[@test_01][:line_number].should == @expected_tasks[@test_01][:line_number]
       @git_blames_pending.tasks[@test_02][:line_number].should == @expected_tasks[@test_02][:line_number]
     end 
+
     it "collects pending spec name as expected" do
       @git_blames_pending.tasks[@test_01][:spec_name].should == @expected_tasks[@test_01][:spec_name]
       @git_blames_pending.tasks[@test_02][:spec_name].should == @expected_tasks[@test_02][:spec_name]
     end 
+
     it "collects pending spec contributors as expected" do
       @git_blames_pending.tasks[@test_01][:contributors].should == @expected_tasks[@test_01][:contributors]
       @git_blames_pending.tasks[@test_02][:contributors].should == @expected_tasks[@test_02][:contributors]
     end 
+
     it "collects pending spec details as expected" do
       @git_blames_pending.tasks[@test_01][:details].should == @expected_tasks[@test_01][:details]
       @git_blames_pending.tasks[@test_02][:details].should == @expected_tasks[@test_02][:details]

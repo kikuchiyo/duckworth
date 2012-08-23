@@ -125,8 +125,8 @@ class Git::Blames::Pending
 
   def find_contributors
     # @tasks = Git::Blames::Pending.new.tasks
-    contributors = []
     @tasks.each_pair do |key, attributes|
+      contributors = []
       `git blame "#{attributes[:spec_file]}"`.each do |blame|
         contributor = blame.split(")")[0].split("(")[1]
         contributor = contributor.split(/\s+\d/)[0]

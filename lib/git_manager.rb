@@ -21,16 +21,18 @@ module Git
       @email_from = config['authentication']['from']
       @email_password = config['authentication']['password']
       @email_mappings = config['users']
+      puts "email_mappings = #{@email_mappings.inspect}"
     end
   
     def send_gmail options
       load_configuration
       recipients = options[:recipients]
+      puts "recipients = #{recipients.inspect}"
       msg = "Subject: #{options[:subject]}\n\n#{options[:message]}"
       smtp = Net::SMTP.new 'smtp.gmail.com', 587
       smtp.enable_starttls
       smtp.start( '', @email_from, @email_password, :login ) do
-        smtp.send_message(msg, @email_from, recipients.map{ |recipient| @email_mappings[recipient]})
+        smtp.send_message( msg, @email_from, recipients.map{ |recipient| @email_mappings["#{recipient.gsub(' ', '_') }" ] } )
       end
     end
   end

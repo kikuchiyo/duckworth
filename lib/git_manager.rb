@@ -1,5 +1,6 @@
 # example usage 
 #   Git::Blames::Pending.new(
+#     :log => <explicit log file to test against>
 #     :root => <root folder where build logs are located>
 #     :rspec => boolean specifying whether or 
 #       not you want to run rspec now to get pending specs
@@ -102,8 +103,10 @@ class Git::Blames::Pending
   include Git::Blames
 
   def initialize options = nil
-    if options.nil? || options[:root].nil? && !options[:rspec]
+    if options.nil? || options[:root].nil? && !options[:rspec] && !options[:log]
       @root = "#{File.dirname(__FILE__)}/logs"
+    elsif options[:log]
+      find_pending_specs_by_logfile_name( options[:log] )
     elsif options[:rspec]
       find_pending_specs_by_rspec_results( rspec_results )
     else
@@ -156,7 +159,8 @@ class Git::Blames::Pending
         puts e
       end
     end
-    files.to_a.select { |log| log.match /\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}/ }.sort.last
+    file_name = files.to_a.select { |log| log.match /\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}/ }.sort.last
+    "#{file_name}/log"
   end
 
   def find_pending_specs_by_rspec_results spec_output

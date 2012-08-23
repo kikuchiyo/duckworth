@@ -57,7 +57,7 @@ module Git
         end
       end
     end
-    def stdout
+    def stdout key, attributes
       puts "\nPending Spec Information:"
       puts "  Description: #{key}"
       puts "  Contributors: #{attributes[:contributors].join(', ')}"

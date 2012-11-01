@@ -9,6 +9,7 @@
 #   in this gems own config/email.yml file
 # example usage 
 #   Git::Managed::Branch.new.delete_branches
+#   Git::Blames::Pending.new( :root => './lib/logs/' ).blame( :email => true )
 
 require 'rubygems'
 require 'net/smtp'
@@ -19,5 +20,3 @@ require "#{ File.dirname(  __FILE__ ) }/managed/branch"
 require "#{ File.dirname(  __FILE__ ) }/emails"
 require "#{ File.dirname(  __FILE__ ) }/blames"
 require "#{ File.dirname(  __FILE__ ) }/blames/pending"
-
-Git::Blames::Pending.new( :root => './lib/logs/' ).blame( :email => true )

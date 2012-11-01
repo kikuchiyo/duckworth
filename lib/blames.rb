@@ -4,10 +4,18 @@ module Git::Blames
   def blame(options = nil)
     if !options[:spam]
       self.tasks_by_collaborator.each_pair do |recipient, message|
+        if message == ''
+          subject = 'Congratulations, you have no pending specs! :)'
+          messy   = 'Woot!'
+        else
+          subject = "Please collaborate to fix consolidated list of specs: "
+          messy   = message
+        end
+
         send_gmail( 
           :recipients => [recipient],
-          :subject => "Please collaborate to fix consolidated list of specs: ",
-          :message => message
+          :subject => subject,
+          :message => messy
         )
       end
     else

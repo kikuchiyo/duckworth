@@ -9,7 +9,7 @@
 #   in this gems own config/email.yml file
 # example usage 
 #   Git::Managed::Branch.new.delete_branches
-#   Git::Blames::Pending.new( :root => './lib/logs/' ).blame( :email => true )
+# Git::Blames::Pending.new( :root => './lib/logs/' ).blame( :email => true )
 
 require 'rubygems'
 require 'net/smtp'

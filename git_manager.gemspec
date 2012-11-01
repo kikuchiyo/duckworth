@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name        = 'git_manager'
-  s.version     = '0.1.0'
+  s.version     = '0.1.2'
   s.date        = '2012-10-31'
   s.summary     = "qa automation engineer assistant"
   s.description = "A QA Automation Enineer's Assistant, utilizing Jenkins and Git."

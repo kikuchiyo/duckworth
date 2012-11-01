@@ -80,5 +80,36 @@ describe Git do
       @git_blames_pending.tasks[@test_01][:details].should == @expected_tasks[@test_01][:details]
       @git_blames_pending.tasks[@test_02][:details].should == @expected_tasks[@test_02][:details]
     end 
+
+    it "consolidates blames into structure for e-mailing each developer once" do
+
+      expected_text =  "\n" +
+        "  Spec:          spec/git_manager_spec.rb:11\n" +
+        "    Collaborators: John Jimenez\n" +
+        "    Title:           Fake test 2 spec/git_manager_spec.rb\n" +
+        "    Details:           # Test 123\n\n\n" +
+        "  Spec:          spec/git_manager_spec.rb:13\n" +
+        "    Collaborators: John Jimenez\n" +
+        "    Title:           Fake test 1 spec/git_manager_spec.rb\n" +
+        "    Details:           # Test 123"
+
+      @git_blames_pending.tasks_by_collaborator.should == {
+        "John Jimenez" => expected_text
+      }
+        # { "  Fake test 2 spec/git_manager_spec.rb"=>{
+        #   :spec_file=>"spec/git_manager_spec.rb", 
+        #   :details=>["    # Test 123"], 
+        #   :contributors=>["John Jimenez"], 
+        #   :name=>"  Fake test 2 spec/git_manager_spec.rb", 
+        #   :line_number=>"11"
+        # }, 
+        # "  Fake test 1 spec/git_manager_spec.rb"=>{
+        #   :spec_file=>"spec/git_manager_spec.rb", 
+        #   :details=>["    # Test 123"], 
+        #   :contributors=>["John Jimenez"], 
+        #   :name=>"  Fake test 1 spec/git_manager_spec.rb", 
+        #   :line_number=>"13"
+        # }
+    end
   end 
 end 

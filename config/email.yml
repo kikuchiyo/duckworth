@@ -12,3 +12,4 @@ authentication:
 users:
   'Joe Schmoe': 'joeschmoe@gmail.com'
   'Jane Doe': 'janedoe@gmail.com'
+  'John Jimenez': 'johnsfakeemail@gmail.com'

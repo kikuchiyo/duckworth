@@ -1,9 +1,43 @@
+
+class Git::Blames::Jenkins
+
+  def initialize options
+    @build_directory = options[:build_directory] 
+    build_number = File.open(
+      "#{@build_directory}/nextBuildNumber", 'r'
+    ).readlines.each { |line| line }.first.to_i - 1
+    @last_log =  "#{@build_directory}/builds/#{build_number}/log"
+  end
+
+  def run
+    Git::Blames::Pending.new(
+      :rspec => false,
+      :log => @last_log,
+      :build_directory => @build_directory
+    ).blame( :email => true )
+  end
+
+end
+
+# describe Git::Blames::MetaData do
+#   
+#   it "knows of jenkins build directory" do
+#     Git::Blames::MetaData::THIS_JENKINS_BUILD_DIRECTORY.should == "/Users/home/var/lib/jenkins/jobs/cookie_monster"
+#   end 
+# 
+#   it "knows of last build number" do
+#     Git::Blames::MetaData::BUILD_NUMBER.should == 267
+#   end 
+# 
+# end
+
 class Git::Blames::Pending 
   attr_accessor :tasks, :rspec_results
 
   include Git::Blames
 
   def initialize options = nil
+    @chdir = false
     if options.nil? || options[:root].nil? && !options[:rspec] && !options[:log]
       @root = "#{File.dirname(__FILE__)}/logs"
     elsif options[:log]
@@ -12,6 +46,7 @@ class Git::Blames::Pending
       find_pending_specs_by_rspec_results( rspec_results )
     else
       @root = options[:root]
+      @chdir = true
       find_pending_specs_by_logfile_name( "#{@root}/#{find_last_logfile_name}" )
     end
     find_contributors
@@ -22,8 +57,7 @@ class Git::Blames::Pending
     results
   end
 
-  def find_contributors
-    # @tasks = Git::Blames::Pending.new.tasks
+  def finder
     @tasks.each_pair do |key, attributes|
       contributors = []
       `git blame "#{attributes[:spec_file]}"`.each do |blame|
@@ -34,6 +68,18 @@ class Git::Blames::Pending
       @tasks[key][:contributors] = contributors.uniq
       @tasks[key][:contributors].reject!{ |contributor| contributor == 'Not Committed Yet'}
     end
+    @tasks
+  end
+
+  def find_contributors
+    if @root
+      Dir.chdir( @root ) { 
+        puts Dir.pwd()
+        finder 
+      }
+      puts Dir.pwd()
+    else; finder; end
+    finder
     @tasks
   end
 

@@ -6,10 +6,10 @@
 #   "User 1 Full Name as found in git blame":"associated_email1@domain.com@"
 #   "User 2 Full Name as found in git blame":"associated_email2@domain.com@"
 authentication:
-  from: you@gmail_hosted_domain.com
-  password: your_password
+  from: 'you@domain.com'
+  password: 'password'
 
 users:
-  'Joe Schmoe': 'joeschmoe@gmail.com'
-  'Jane Doe': 'janedoe@gmail.com'
-  'John Jimenez': 'johnsfakeemail@gmail.com'
+  'Joe Schmoe':   'joeschmoe@domain.com'
+  'Jane Doe':     'janedoe@domain.com'
+  'John Jimenez': 'fake-email0@domain.com'

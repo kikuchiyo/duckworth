@@ -95,7 +95,9 @@ describe Duckworth do
     @duckworth = Duckworth.new(
       :jenkins_root => './spec/fixtures',
       :job_name => 'assign_pending_tasks'
-    ).blame( :spam => true )
+    )
+
+    @duckworth.blame( :spam => false )
 
     @expected_tasks = {
       @test_01  => {
@@ -156,19 +158,5 @@ describe Duckworth do
       "Joe Schmoe" => '',
       "Jane Doe" => '',
     }
-      # { "  Fake test 2 spec/git_manager_spec.rb"=>{
-      #   :spec_file=>"spec/git_manager_spec.rb", 
-      #   :details=>["    # Test 123"], 
-      #   :contributors=>["John Jimenez"], 
-      #   :name=>"  Fake test 2 spec/git_manager_spec.rb", 
-      #   :line_number=>"11"
-      # }, 
-      # "  Fake test 1 spec/git_manager_spec.rb"=>{
-      #   :spec_file=>"spec/git_manager_spec.rb", 
-      #   :details=>["    # Test 123"], 
-      #   :contributors=>["John Jimenez"], 
-      #   :name=>"  Fake test 1 spec/git_manager_spec.rb", 
-      #   :line_number=>"13"
-      # }
   end
 end 

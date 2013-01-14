@@ -1,0 +1,45 @@
+= Duckworth
+
+== Jenkins' side-kick, Duckworth, can help keep your ci jobs well kempt.
+
+=== Usage
+
+==== Configuring
+
+  Fill out config/email.yml with an email account to e-mail from
+  and password.  Fill out team member names as listed by git
+  and their e-mails.
+
+==== Create new instance
+
+  Duckworth.new( 
+    :jenkins_root => <directory_containing_your_jobs_folder>, 
+    :job_name => <job_name_you_want_to_help>
+  )
+
+==== Print out pending specs with associated contributors
+
+  duckworth = Duckworth.new( 
+    :jenkins_root => <directory_containing_your_jobs_folder>, 
+    :job_name => <job_name_you_want_to_help>
+  )
+
+  duckworth.blame( :spam => true, :email => false )
+
+===== Mass-Email out pending specs with associated contributors
+
+  duckworth = Duckworth.new( 
+    :jenkins_root => <directory_containing_your_jobs_folder>, 
+    :job_name => <job_name_you_want_to_help>
+  )
+
+  duckworth.blame( :spam => true, :email => true )
+
+===== Email out pending specs with associated contributors - one e-mail to each team member 
+
+  duckworth = Duckworth.new( 
+    :jenkins_root => <directory_containing_your_jobs_folder>, 
+    :job_name => <job_name_you_want_to_help>
+  )
+
+  duckworth.blame( :spam => false, :email => true )

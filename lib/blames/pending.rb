@@ -1,35 +1,35 @@
-
-class Git::Blames::Jenkins
-
+class Duckworth
   def initialize options
-    @build_directory = options[:build_directory] 
-    build_number = File.open(
-      "#{@build_directory}/nextBuildNumber", 'r'
-    ).readlines.each { |line| line }.first.to_i - 1
-    @last_log =  "#{@build_directory}/builds/#{build_number}/log"
+    @jenkins_root = options[:jenkins_root]
+    @job_name = options[:job_name]
+    @log_dir = log_dir_from_builds_path( builds_path )
+    @last_log = "#{@log_dir}/log"
   end
 
-  def run
+  def workspace
+    "#{@jenkins_root}/workspace"
+  end
+
+  def builds_path
+    "#{@jenkins_root}/jobs/#{@job_name}/builds"
+  end
+
+  def log_dir_from_builds_path( builds_path )
+    "#{ builds_path }/#{ last_build_number( builds_path ) }"
+  end
+
+  def last_build_number( builds_path )
+    File.open(
+      "#{builds_path}/nextBuildNumber", 'r'
+    ).readlines.each { |line| line }.first.to_i - 1
+  end
+
+  def assign_pending_tasks
     Git::Blames::Pending.new(
-      :rspec => false,
-      :log => @last_log,
-      :build_directory => @build_directory
+      :log_file_name => @last_log, :workspace => @workspace
     ).blame( :email => true )
   end
-
 end
-
-# describe Git::Blames::MetaData do
-#   
-#   it "knows of jenkins build directory" do
-#     Git::Blames::MetaData::THIS_JENKINS_BUILD_DIRECTORY.should == "/Users/home/var/lib/jenkins/jobs/cookie_monster"
-#   end 
-# 
-#   it "knows of last build number" do
-#     Git::Blames::MetaData::BUILD_NUMBER.should == 267
-#   end 
-# 
-# end
 
 class Git::Blames::Pending 
   attr_accessor :tasks, :rspec_results
@@ -37,24 +37,9 @@ class Git::Blames::Pending
   include Git::Blames
 
   def initialize options = nil
-    @chdir = false
-    if options.nil? || options[:root].nil? && !options[:rspec] && !options[:log]
-      @root = "#{File.dirname(__FILE__)}/logs"
-    elsif options[:log]
-      find_pending_specs_by_logfile_name( options[:log] )
-    elsif options[:rspec]
-      find_pending_specs_by_rspec_results( rspec_results )
-    else
-      @root = options[:root]
-      @chdir = true
-      find_pending_specs_by_logfile_name( "#{@root}/#{find_last_logfile_name}" )
-    end
+    @log_file_name = optins[:log_file_name]    
+    find_pending_specs
     find_contributors
-  end
-
-  def rspec_results
-    results =  `rspec spec`
-    results
   end
 
   def finder
@@ -72,13 +57,10 @@ class Git::Blames::Pending
   end
 
   def find_contributors
-    if @root
-      Dir.chdir( @root ) { 
-        puts Dir.pwd()
-        finder 
-      }
+    Dir.chdir( @workspace ) { 
       puts Dir.pwd()
-    else; finder; end
+      finder 
+    }
     finder
     @tasks
   end
@@ -95,51 +77,8 @@ class Git::Blames::Pending
     ( status == 'found new pending spec' || status == 'updating spec data' ) && line.match( /^[\s\t]*\#/ )
   end
 
-  def find_last_logfile_name
-    begin
-      files = Dir.new @root
-    rescue => e 
-      begin
-      Dir.mkdir @root
-      files = Dir.new @root
-      rescue
-        puts e
-      end
-    end
-    file_name = files.to_a.select { |log| log.match /\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}/ }.sort.last
-    "#{file_name}/log"
-  end
-
-  def find_pending_specs_by_rspec_results spec_output
-    status = ''
-    @tasks = {}
-    task = {}
-
-    spec_output.each do |line|
-      if found_pending_marker line
-        status = 'start'
-        
-      elsif found_new_spec_marker line, status
-        status = 'found new pending spec'  
-        task = {}
-        task[:name] = line.chomp
-        task[:details] = []
-
-      elsif found_spec_details_marker line, status
-        status = 'updating spec data'
-        if line.match /(spec.*)[:](\d+)/
-          task[:spec_file] = $1
-          task[:line_number] = $2
-        else
-          task[:details].push line.chomp
-        end
-        @tasks[task[:name]] = task
-      end
-    end
-  end
-
-  def find_pending_specs_by_logfile_name logfile_name
-    logfile = File.new( logfile_name )
+  def find_pending_specs
+    logfile = File.new( @log_file_name )
     status = ''
     @tasks = {}
     task = {}

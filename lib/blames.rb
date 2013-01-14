@@ -43,9 +43,4 @@ module Git::Blames
     puts "  Line: #{attributes[:line_number]}\n"
   end
 
-  # class Pending
-  # end
-
-  # class Blame
-  # end
 end

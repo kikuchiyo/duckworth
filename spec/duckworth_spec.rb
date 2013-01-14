@@ -97,7 +97,7 @@ describe Duckworth do
       :job_name => 'assign_pending_tasks'
     )
 
-    @duckworth.blame( :spam => false )
+    @duckworth.report( :spam => false )
 
     @expected_tasks = {
       @test_01  => {
@@ -142,7 +142,7 @@ describe Duckworth do
     @duckworth.tasks[@test_02][:details].should == @expected_tasks[@test_02][:details]
   end 
 
-  it "consolidates blames into structure for e-mailing each developer once" do
+  it "consolidates reports into structure for e-mailing each developer once" do
     expected_text =  "\n" +
       "  Spec:          spec/git_manager_spec.rb:11\n" +
       "    Collaborators: John Jimenez\n" +

@@ -80,7 +80,7 @@ module Toolbag
       @email_mappings = config['users']
     end
 
-    def blame(options = nil)
+    def report(options = nil)
       if !options[:spam]
         self.tasks_by_contributor.each_pair do |recipient, message|
           if message == ''

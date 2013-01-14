@@ -117,18 +117,6 @@ class Duckworth
       build_number
     end
 
-    def found_pending_marker line
-      line.match( /^[\s\t]*Pending:/ )
-    end
-
-    def found_new_spec_marker line, status
-      ( status == 'start' || status == 'updating spec data' ) && !line.match( /^[\s\t]*#/ )
-    end
-
-    def found_spec_details_marker line, status
-      ( status == 'found new pending spec' || status == 'updating spec data' ) && line.match( /^[\s\t]*\#/ )
-    end
-
     def find_pending_specs
       logfile = File.new( log )
       status = ''

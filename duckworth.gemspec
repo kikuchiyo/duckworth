@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name        = 'duckworth'
-  s.version     = '0.0.1'
+  s.version     = '0.0.2'
   s.date        = '2013-01-12'
   s.summary     = "QA Automation Engineer Assistant"
   s.description = "QA Automation Engineer Assistant, for Jenkins and Git."

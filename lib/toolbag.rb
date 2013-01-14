@@ -12,36 +12,6 @@ module Toolbag
     def found_spec_details_marker line, status
       ( status == 'found new pending spec' || status == 'updating spec data' ) && line.match( /^[\s\t]*\#/ )
     end
-
-    def find_pending_specs
-      logfile = File.new( @log_file_name )
-      status = ''
-      @tasks = {}
-      task = {}
-
-      logfile.readlines.each do |line|
-
-        if found_pending_marker line
-          status = 'start'
-          
-        elsif found_new_spec_marker line, status
-          status = 'found new pending spec'  
-          task = {}
-          task[:name] = line.chomp
-          task[:details] = []
-
-        elsif found_spec_details_marker line, status
-          status = 'updating spec data'
-          if line.match /(spec.*)[:](\d+)/
-            task[:spec_file] = $1
-            task[:line_number] = $2
-          else
-            task[:details].push line.chomp
-          end
-          @tasks[task[:name]] = task
-        end
-      end
-    end
   end
 
   module Searches

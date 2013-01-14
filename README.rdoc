@@ -1,6 +1,6 @@
 = Duckworth 
 
-'http://ducktales.aniworld.ru/pics/heroes_big/duckworth1.jpg'
+http://ducktales.aniworld.ru/pics/heroes_big/duckworth1.jpg
 
 == Jenkins' side-kick, Duckworth, can help keep your ci jobs well kempt.
 
